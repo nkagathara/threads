@@ -111,7 +111,7 @@ export async function fetchUsers ({userId,searchString = "",pageNumber = 1,pageS
 export async function getActivity (userId:string){
     try {
         connectToDataBase();
-        console.log("userId::",userId);
+        
         // Find all threads created by users
         const userThreads = await Thread.find({author:userId});
         // Collect all child thread id(replies) from the children
@@ -119,7 +119,7 @@ export async function getActivity (userId:string){
         const childThreadIds = userThreads.reduce((acc,userThread)=>{
             return acc.concat(userThread.children);
         },[])
-        console.log("childThreadIds::",childThreadIds);
+        
         const replies = await Thread.find({
             _id:{ $in: childThreadIds},
             author:{$ne: userId}
@@ -128,7 +128,7 @@ export async function getActivity (userId:string){
             model: User,
             select: 'name image _id'
         })
-        console.log("replies:",replies);
+        
         return replies;
     } catch (error: any) {
         throw new Error(`Failed to create/update user: ${error.message}`)

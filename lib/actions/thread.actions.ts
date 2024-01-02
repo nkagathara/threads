@@ -14,8 +14,6 @@ interface Params {
 
 export async function createThread({text,author,communityId,path}: Params){
     try {
-        console.log("text::",text);
-        console.log("author::",author);
         connectToDataBase();
         const createdThread = await Thread.create({
             text,
