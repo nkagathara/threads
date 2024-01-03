@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache";
+import Community from "../models/community.model";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
 import { connectToDataBase } from "../mongoose";
@@ -15,11 +16,24 @@ interface Params {
 export async function createThread({text,author,communityId,path}: Params){
     try {
         connectToDataBase();
+        console.log("communityId::",communityId);
+        const communityIdObject = await Community.findOne(
+            { id: communityId },
+            { _id: 1 }
+          );
+        console.log("communityIdObject:::",communityIdObject);
         const createdThread = await Thread.create({
             text,
             author,
-            community: null,
+            community: communityIdObject,
         });
+
+        if (communityIdObject) {
+            // Update Community model
+            await Community.findByIdAndUpdate(communityIdObject, {
+              $push: { threads: createdThread._id },
+            });
+          }
 
         //Update User Model
         await User.findByIdAndUpdate(author, {
